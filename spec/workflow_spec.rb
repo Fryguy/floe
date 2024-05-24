@@ -66,6 +66,12 @@ RSpec.describe Floe::Workflow do
     it "raises an exception for invalid context" do
       expect { described_class.new(make_payload({"Start" => {"Type" => "Success"}}), "abc") }.to raise_error(Floe::InvalidWorkflowError, /unexpected token/)
     end
+
+    it "raises an exception for invalid resource scheme in a Task state" do
+      payload = make_payload({"Start" => {"Type" => "Task", "Resource" => "invalid://foo"}})
+
+      expect { described_class.new(payload) }.to raise_error(Floe::InvalidWorkflowError, "Invalid resource scheme [invalid]")
+    end
   end
 
   describe "#run_nonblock" do

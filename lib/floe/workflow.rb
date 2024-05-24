@@ -110,7 +110,7 @@ module Floe
         context.state["Name"] = start_at
         context.state["Input"] = context.execution["Input"].dup
       end
-    rescue JSON::ParserError => err
+    rescue StandardError => err
       raise Floe::InvalidWorkflowError, err.message
     end
 
