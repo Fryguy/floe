@@ -59,6 +59,26 @@ RSpec.describe Floe::ContainerRunner::Docker do
         subject.run_async!("docker://hello-world:latest", {}, {}, context)
       end
     end
+
+    context "with volumes" do
+      it "passes a single volume to docker run" do
+        stub_good_run!("docker", :params => ["run", :detach, [:label, "execution_id=#{execution_id}"], [:v, "/tmp/runner:/runner:z"], [:name, a_string_starting_with("floe-hello-world-")], "hello-world:latest"], :output => "#{container_id}\n")
+
+        subject.run_async!("docker://hello-world:latest", {}, {}, context, :volumes => ["/tmp/runner:/runner:z"])
+      end
+
+      it "passes multiple volumes to docker run" do
+        stub_good_run!("docker", :params => ["run", :detach, [:label, "execution_id=#{execution_id}"], [:v, "/tmp/a:/a:z"], [:v, "/tmp/b:/b:z"], [:name, a_string_starting_with("floe-hello-world-")], "hello-world:latest"], :output => "#{container_id}\n")
+
+        subject.run_async!("docker://hello-world:latest", {}, {}, context, :volumes => ["/tmp/a:/a:z", "/tmp/b:/b:z"])
+      end
+
+      it "passes no volumes when volumes is empty" do
+        stub_good_run!("docker", :params => ["run", :detach, [:label, "execution_id=#{execution_id}"], [:name, a_string_starting_with("floe-hello-world-")], "hello-world:latest"], :output => "#{container_id}\n")
+
+        subject.run_async!("docker://hello-world:latest", {}, {}, context, :volumes => [])
+      end
+    end
   end
 
   describe "#status!" do
